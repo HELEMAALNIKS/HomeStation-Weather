@@ -11,7 +11,6 @@
 DHT dht(DHTPIN, DHTTYPE);
 
 //Define variables
-unsigned long lastReadAt = millis();
 unsigned long lastTemperatureSend = millis();
 bool lastInputState = false;
 
@@ -117,11 +116,7 @@ void setup() {
     sensorLong.setValue(LONG, (uint8_t)15U);
     
     dht.begin();
-}
 
-void loop() {
-    mqtt.loop();
-    
     humidityValue = dht.readHumidity();
     temperatureValue = dht.readTemperature();
     signalstrengthValue = WiFi.RSSI();
@@ -133,24 +128,31 @@ void loop() {
     if (isnan(temperatureValue)) {
       temperatureValue = 0;
     }
-
-    if ((millis() - lastTemperatureSend) > 10000) { // read in 30ms interval
         
-        sensorTemperature.setValue(temperatureValue);
-        Serial.print("Current temperature is: ");
-        Serial.print(temperatureValue);
-        Serial.println("°C");
+    sensorTemperature.setValue(temperatureValue);
+    Serial.print("Current temperature is: ");
+    Serial.print(temperatureValue);
+    Serial.println("°C");
 
-        sensorHumidity.setValue(humidityValue);
-        Serial.print("Current humidity is: ");
-        Serial.print(humidityValue);
-        Serial.println("%");
+    sensorHumidity.setValue(humidityValue);
+    Serial.print("Current humidity is: ");
+    Serial.print(humidityValue);
+    Serial.println("%");
 
-        sensorSignalstrength.setValue(signalstrengthValue);
-        Serial.print("Current signal strength is: ");
-        Serial.print(signalstrengthValue);
-        Serial.println("%");
-        
-        lastTemperatureSend = millis();
-    }
+    sensorSignalstrength.setValue(signalstrengthValue);
+    Serial.print("Current signal strength is: ");
+    Serial.print(signalstrengthValue);
+    Serial.println("%");
+  
+    lastTemperatureSend = millis();
+
+    delay(10000);
+    Serial.println("Going to sleep... zzzzzz...");
+    ESP.deepSleep(0.5 * 60 * 1000 * 1000);
+
+}
+
+void loop() {
+    mqtt.loop();
+    
 }
