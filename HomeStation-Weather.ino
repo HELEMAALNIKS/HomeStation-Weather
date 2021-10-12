@@ -5,6 +5,11 @@
 #include <ArduinoHA.h>
 #include "DHT.h"
 
+#include "SerialCom.h"
+#include "Types.h"
+
+particleSensorState_t state;
+
 //Define DHT sensor pin and type
 #define DHTPIN 13
 #define DHTTYPE DHT22
@@ -35,6 +40,8 @@ HASensor sensorSignalstrength("Signal_strength");
 void setup() {
     Serial.begin(9600);
     Serial.println("Starting...");
+
+    SerialCom::setup();
 
     // Unique ID must be set!
     byte mac[WL_MAC_ADDR_LENGTH];
@@ -117,6 +124,13 @@ void setup() {
     
     dht.begin();
 
+}
+
+void loop() {
+    mqtt.loop();
+
+    SerialCom::handleUart(state);
+
     humidityValue = dht.readHumidity();
     temperatureValue = dht.readTemperature();
     signalstrengthValue = WiFi.RSSI();
@@ -128,31 +142,30 @@ void setup() {
     if (isnan(temperatureValue)) {
       temperatureValue = 0;
     }
-        
-    sensorTemperature.setValue(temperatureValue);
-    Serial.print("Current temperature is: ");
-    Serial.print(temperatureValue);
-    Serial.println("°C");
 
-    sensorHumidity.setValue(humidityValue);
-    Serial.print("Current humidity is: ");
-    Serial.print(humidityValue);
-    Serial.println("%");
+    if ((millis() - lastTemperatureSend) > 10000) { // read in 30ms interval
 
-    sensorSignalstrength.setValue(signalstrengthValue);
-    Serial.print("Current signal strength is: ");
-    Serial.print(signalstrengthValue);
-    Serial.println("%");
-  
-    lastTemperatureSend = millis();
+        sensorTemperature.setValue(temperatureValue);
+        Serial.print("Current temperature is: ");
+        Serial.print(temperatureValue);
+        Serial.println("°C");
+    
+        sensorHumidity.setValue(humidityValue);
+        Serial.print("Current humidity is: ");
+        Serial.print(humidityValue);
+        Serial.println("%");
+    
+        sensorSignalstrength.setValue(signalstrengthValue);
+        Serial.print("Current signal strength is: ");
+        Serial.print(signalstrengthValue);
+        Serial.println("%");
+      
+        lastTemperatureSend = millis();
+    
+//        delay(10000);
+//        Serial.println("Going to sleep... zzzzzz...");
+//        ESP.deepSleep(0.5 * 60 * 1000 * 1000);
 
-    delay(10000);
-    Serial.println("Going to sleep... zzzzzz...");
-    ESP.deepSleep(0.5 * 60 * 1000 * 1000);
-
-}
-
-void loop() {
-    mqtt.loop();
+    }
     
 }
