@@ -37,6 +37,7 @@ HASensor sensorTemperature("Temperature");
 HASensor sensorHumidity("Humidity");
 HASensor sensorAirquality("PM25");
 HASensor sensorSignalstrength("Signal_strength");
+HASensor sensorBattery("Battery");
 
 void setup() {
     Serial.begin(9600);
@@ -70,8 +71,9 @@ void setup() {
     String latNameStr = student_id + " Lat";
     String temperatureNameStr = student_id + " Temperature";
     String humidityNameStr = student_id + " Humidity";
-    String pm25NameStr = student_id + " PM2.5";
+    String pm25NameStr = student_id + " Air Quality";
     String signalstrengthNameStr = student_id + " Signal Strength";
+    String batteryNameStr = student_id + " Battery Power";
     
     //Convert the strings to const char*
     const char* stationName = stationNameStr.c_str();
@@ -82,6 +84,7 @@ void setup() {
     const char* humidityName = humidityNameStr.c_str();
     const char* pm25Name = pm25NameStr.c_str();
     const char* signalstrengthName = signalstrengthNameStr.c_str();
+    const char* batteryName = batteryNameStr.c_str();
 
     //Set main device name
     device.setName(stationName);
@@ -112,6 +115,10 @@ void setup() {
     sensorSignalstrength.setName(signalstrengthName);
     sensorSignalstrength.setDeviceClass("signal_strength");
     sensorSignalstrength.setUnitOfMeasurement("dBm");
+
+    sensorBattery.setName(batteryName);
+    sensorBattery.setDeviceClass("battery");
+    sensorBattery.setUnitOfMeasurement("%");
 
     mqtt.begin(BROKER_ADDR, BROKER_USERNAME, BROKER_PASSWORD);
 
@@ -150,7 +157,7 @@ void loop() {
       temperatureValue = 0;
     }
 
-    if ((millis() - lastTemperatureSend) > 10000) { // read in 30ms interval
+    if (((millis() - lastTemperatureSend) > 10000) && (state.measurements[4] != 0)) { // read in 10s interval
 
         sensorTemperature.setValue(temperatureValue);
         Serial.print("Current temperature is: ");
@@ -171,12 +178,16 @@ void loop() {
         Serial.print("Current air quality is: ");
         Serial.print(state.avgPM25);
         Serial.println("µg/m3");
+
+        sensorBattery.setValue(96);
+        Serial.print("Current battery level is: ");
+        Serial.print(96);
+        Serial.println("%");
       
         lastTemperatureSend = millis();
     
-//        delay(10000);
-//        Serial.println("Going to sleep... zzzzzz...");
-//        ESP.deepSleep(0.5 * 60 * 1000 * 1000);
+        Serial.println("Going to sleep... zzzzzz...");
+        ESP.deepSleep(0.5 * 60 * 1000 * 1000);
 
     }
     
