@@ -35,6 +35,7 @@ HASensor sensorLong("Long");
 HASensor sensorLat("Lat");
 HASensor sensorTemperature("Temperature");
 HASensor sensorHumidity("Humidity");
+HASensor sensorAirquality("PM25");
 HASensor sensorSignalstrength("Signal_strength");
 
 void setup() {
@@ -69,6 +70,7 @@ void setup() {
     String latNameStr = student_id + " Lat";
     String temperatureNameStr = student_id + " Temperature";
     String humidityNameStr = student_id + " Humidity";
+    String pm25NameStr = student_id + " PM2.5";
     String signalstrengthNameStr = student_id + " Signal Strength";
     
     //Convert the strings to const char*
@@ -78,6 +80,7 @@ void setup() {
     const char* latName = latNameStr.c_str();
     const char* temperatureName = temperatureNameStr.c_str();
     const char* humidityName = humidityNameStr.c_str();
+    const char* pm25Name = pm25NameStr.c_str();
     const char* signalstrengthName = signalstrengthNameStr.c_str();
 
     //Set main device name
@@ -101,6 +104,10 @@ void setup() {
     sensorHumidity.setName(humidityName);
     sensorHumidity.setDeviceClass("humidity");
     sensorHumidity.setUnitOfMeasurement("%");
+
+    sensorAirquality.setName(pm25Name);
+    sensorAirquality.setDeviceClass("pm25");
+    sensorAirquality.setUnitOfMeasurement("μg/m³");
     
     sensorSignalstrength.setName(signalstrengthName);
     sensorSignalstrength.setDeviceClass("signal_strength");
@@ -158,7 +165,12 @@ void loop() {
         sensorSignalstrength.setValue(signalstrengthValue);
         Serial.print("Current signal strength is: ");
         Serial.print(signalstrengthValue);
-        Serial.println("%");
+        Serial.println("dBm");
+
+        sensorAirquality.setValue(state.avgPM25);
+        Serial.print("Current air quality is: ");
+        Serial.print(state.avgPM25);
+        Serial.println("µg/m3");
       
         lastTemperatureSend = millis();
     
