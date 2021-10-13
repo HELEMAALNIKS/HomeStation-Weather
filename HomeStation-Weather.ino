@@ -36,8 +36,9 @@ HASensor sensorLat("Lat");
 HASensor sensorTemperature("Temperature");
 HASensor sensorHumidity("Humidity");
 HASensor sensorAirquality("PM25");
+HASensor sensorWindspeed("Wind_speed");
 HASensor sensorSignalstrength("Signal_strength");
-HASensor sensorBattery("Battery");
+HASensor sensorBattery("Battery_power");
 
 void setup() {
     Serial.begin(9600);
@@ -72,6 +73,7 @@ void setup() {
     String temperatureNameStr = student_id + " Temperature";
     String humidityNameStr = student_id + " Humidity";
     String pm25NameStr = student_id + " Air Quality";
+    String windspeedNameStr = student_id + " Wind speed";
     String signalstrengthNameStr = student_id + " Signal Strength";
     String batteryNameStr = student_id + " Battery Power";
     
@@ -83,6 +85,7 @@ void setup() {
     const char* temperatureName = temperatureNameStr.c_str();
     const char* humidityName = humidityNameStr.c_str();
     const char* pm25Name = pm25NameStr.c_str();
+    const char* windspeedName = windspeedNameStr.c_str();
     const char* signalstrengthName = signalstrengthNameStr.c_str();
     const char* batteryName = batteryNameStr.c_str();
 
@@ -111,6 +114,10 @@ void setup() {
     sensorAirquality.setName(pm25Name);
     sensorAirquality.setDeviceClass("pm25");
     sensorAirquality.setUnitOfMeasurement("μg/m³");
+
+    sensorWindspeed.setName(windspeedName);
+    sensorWindspeed.setIcon("mdi:weather-windy");
+    sensorWindspeed.setUnitOfMeasurement("km/h");
     
     sensorSignalstrength.setName(signalstrengthName);
     sensorSignalstrength.setDeviceClass("signal_strength");
@@ -183,11 +190,16 @@ void loop() {
         Serial.print("Current battery level is: ");
         Serial.print(96);
         Serial.println("%");
+
+        sensorWindspeed.setValue(6);
+        Serial.print("Current wind speed is: ");
+        Serial.print(6);
+        Serial.println("km/h");
       
         lastTemperatureSend = millis();
     
         Serial.println("Going to sleep... zzzzzz...");
-        ESP.deepSleep(0.5 * 60 * 1000 * 1000);
+        ESP.deepSleep(10 * 60 * 1000 * 1000);
 
     }
     
