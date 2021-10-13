@@ -150,7 +150,7 @@ void setup() {
 void loop() {
     mqtt.loop();
 
-    SerialCom::handleUart(state);
+//    SerialCom::handleUart(state);
 
     humidityValue = dht.readHumidity();
     temperatureValue = dht.readTemperature();
@@ -164,7 +164,7 @@ void loop() {
       temperatureValue = 0;
     }
 
-    if (((millis() - lastTemperatureSend) > 10000) && (state.measurements[4] != 0)) { // read in 10s interval
+    if ((millis() - lastTemperatureSend) > 10000) { // read in 10s interval
 
         sensorTemperature.setValue(temperatureValue);
         Serial.print("Current temperature is: ");
@@ -181,9 +181,9 @@ void loop() {
         Serial.print(signalstrengthValue);
         Serial.println("dBm");
 
-        sensorAirquality.setValue(state.avgPM25);
+        sensorAirquality.setValue(10);
         Serial.print("Current air quality is: ");
-        Serial.print(state.avgPM25);
+        Serial.print(10);
         Serial.println("µg/m3");
 
         sensorBattery.setValue(96);
